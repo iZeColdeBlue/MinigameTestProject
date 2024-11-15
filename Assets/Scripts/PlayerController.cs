@@ -7,7 +7,12 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
 
+    public float speed = 0.1f;
+
     private  Rigidbody rb;
+
+    public AudioClip collectSound;
+    private AudioSource audioSource;
 
     private float movementX;
     private float movementY;
@@ -30,8 +35,15 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Vector3 direction = new Vector3(movementX, 0, movementY);
-
-
         rb.AddForce(direction);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+      //Debug.Log("Collected!");
+
+        other.gameObject.SetActive(false);
+
+        audioSource.PlayOneShot(collectSound); 
     }
 }
