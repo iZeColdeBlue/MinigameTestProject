@@ -7,11 +7,14 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
 
-    public float speed = 0.1f;
+    public float speed = 1.0f;
 
     private  Rigidbody rb;
 
     public AudioClip collectSound;
+    public AudioClip deathSound;
+
+    public AudioSource backgroundMusic;
     private AudioSource audioSource;
 
     private float movementX;
@@ -21,6 +24,7 @@ public class PlayerController : MonoBehaviour
     void Start() 
     {
         rb=GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnMove(InputValue movementValue)
@@ -40,10 +44,24 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-      //Debug.Log("Collected!");
+        //Debug.Log("Collected!");
 
-        other.gameObject.SetActive(false);
+        if (other.gameObject.CompareTag("Diamond"))
+        {
+            other.gameObject.SetActive(false);
 
-        audioSource.PlayOneShot(collectSound); 
+            audioSource.PlayOneShot(collectSound);
+        }
+
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("You got caught!");
+
+            audioSource.PlayOneShot(deathSound);
+
+            backgroundMusic.Stop();
+
+            rb.isKinematic = true;
+        }
     }
 }
