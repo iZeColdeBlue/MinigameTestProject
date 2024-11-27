@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,17 +16,27 @@ public class PlayerController : MonoBehaviour
     public AudioClip collectSound;
     public AudioClip deathSound;
 
+    public TextMeshProUGUI counterText;
+    public TextMeshProUGUI gameEndText;
+
     public AudioSource backgroundMusic;
     private AudioSource audioSource;
 
     private float movementX;
     private float movementY;
 
+    private int maxCounter;
+    private int counter = 0;
+
     // Start is called before the first frame update
     void Start() 
     {
         rb=GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
+
+        maxCounter = GameObject.FindGameObjectsWithTag("Diamond").Length;
+
+        SetCountText();
     }
 
     private void OnMove(InputValue movementValue)
@@ -50,18 +62,41 @@ public class PlayerController : MonoBehaviour
         {
             other.gameObject.SetActive(false);
 
-            audioSource.PlayOneShot(collectSound);
+            //audioSource.PlayOneShot(collectSound);
+
+            counter++;
+
+            SetCountText();
+
+            if (counter >= maxCounter) {
+
+                gameEndText.text = "You Win!";
+            }
         }
 
         if (other.gameObject.CompareTag("Enemy"))
         {
             Debug.Log("You got caught!");
-
-            audioSource.PlayOneShot(deathSound);
+    
+            //audioSource.PlayOneShot(deathSound);
 
             backgroundMusic.Stop();
 
             rb.isKinematic = true;
+
+            gameEndText.text = "WASTED! \n YOU FAILED!";
+
+            Invoke("backToMenu", 5f);
+              
         }
+    }
+
+    private void SetCountText() {
+        counterText.text = "Diamonds: " + counter + " | " + maxCounter;
+    }
+
+    private void backToMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
